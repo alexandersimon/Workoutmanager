@@ -23,6 +23,15 @@ public class ScalingOption {
     @OneToMany(
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}
     )*/
+    /*
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )*/
+    /*
+    @OneToMany(
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )*/
     @OneToMany(
             cascade = CascadeType.ALL,
             orphanRemoval = true

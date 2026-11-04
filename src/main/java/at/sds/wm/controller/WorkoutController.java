@@ -36,9 +36,8 @@ public class WorkoutController {
     private final WorkoutService workoutService;
 
     public WorkoutController(WorkoutService workoutService) {
-
         this.workoutService = workoutService;
-        }
+    }
 
     @PostMapping("/workouts")
     @Operation(summary = "create a workout", description = "create a workout using data from RequestBody 'workout'")

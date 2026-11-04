@@ -20,7 +20,6 @@ public class Workout {
     @Valid
     @Schema(name = "workout id", required = true)
     @Id
-  //@GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotEmpty(message = "workout name is mandatory but is empty")
@@ -41,12 +40,16 @@ public class Workout {
     //@OneToMany
     /*
     @OneToMany(
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-    )
-     */
-    @OneToMany(
         cascade = CascadeType.ALL,
         orphanRemoval = true
+    )*/
+    /*
+    @OneToMany(
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )*/
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<ScalingOption> scalingOptions;
 
