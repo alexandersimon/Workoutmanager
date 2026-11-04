@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -113,9 +112,9 @@ public class WorkoutModelTest {
                 .build();
 
         assertEquals(6, runWorkout.getRounds());
-        assertEquals(400.0, runWorkout.getRxOption().getExercises().get(0).getDistance());
+        assertEquals(400.0, runWorkout.getRxOption().getExercises().getFirst().getDistance());
         assertEquals(4, runWorkout.getBeginnerOption().getRounds());
-        assertEquals(200.0, runWorkout.getBeginnerOption().getExercises().get(0).getDistance());
+        assertEquals(200.0, runWorkout.getBeginnerOption().getExercises().getFirst().getDistance());
     }
 
     @Test
@@ -143,8 +142,8 @@ public class WorkoutModelTest {
                 )
                 .build();
 
-        assertEquals(Arrays.asList(21, 15, 9), fran.getRxOption().getExercises().get(0).getReps());
-        assertEquals(95.0, fran.getRxOption().getExercises().get(0).getWeightMale());
+        assertEquals(Arrays.asList(21, 15, 9), fran.getRxOption().getExercises().getFirst().getReps());
+        assertEquals(95.0, fran.getRxOption().getExercises().getFirst().getWeightMale());
         assertEquals("Ring Row", fran.getBeginnerOption().getExercises().get(1).getMovement().getName());
     }
 

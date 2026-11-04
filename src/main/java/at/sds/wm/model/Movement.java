@@ -6,14 +6,23 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name="Movement")
+@Table(name="movement")
 public class Movement {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name", nullable = false, length = 150)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", length = 30)
     private MovementCategory category;
+
+    @Column(name = "description", length = 2000)
     private String description;
+
+    @Column(name = "weighted", nullable = false)
     private boolean weighted;
 
     /**
@@ -111,8 +120,7 @@ public class Movement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Movement)) return false;
-        Movement m = (Movement) o;
+        if (!(o instanceof Movement m)) return false;
         return Objects.equals(id, m.id);
     }
 

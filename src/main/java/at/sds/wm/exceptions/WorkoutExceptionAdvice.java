@@ -3,14 +3,10 @@ package at.sds.wm.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,7 +23,7 @@ public class WorkoutExceptionAdvice {
             List<FieldError> fieldErrorList = e.getFieldErrors();
             AtomicReference<String> message = new AtomicReference<>("");
 
-            fieldErrorList.stream()
+            fieldErrorList
                     .forEach(fieldError -> message.set("Field name: '" + fieldError.getField() + "'"
                             + " Rejected Value: (" + fieldError.getRejectedValue() + ")"
                             + " Message: " + fieldError.getDefaultMessage()));

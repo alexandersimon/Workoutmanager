@@ -46,28 +46,28 @@ public class ScalingOptionBuilder {
 
     public ScalingOptionBuilder weightMale(double weight) {
         if (!scalingOption.getExercises().isEmpty()) {
-            scalingOption.getExercises().get(scalingOption.getExercises().size() - 1).setWeightMale(weight);
+            scalingOption.getExercises().getLast().setWeightMale(weight);
         }
         return this;
     }
 
     public ScalingOptionBuilder weightFemale(double weight) {
         if (!scalingOption.getExercises().isEmpty()) {
-            scalingOption.getExercises().get(scalingOption.getExercises().size() - 1).setWeightFemale(weight);
+            scalingOption.getExercises().getLast().setWeightFemale(weight);
         }
         return this;
     }
 
     public ScalingOptionBuilder weightUnit(at.sds.wm.model.enums.WeightUnit unit) {
         if (!scalingOption.getExercises().isEmpty()) {
-            scalingOption.getExercises().get(scalingOption.getExercises().size() - 1).setWeightUnit(unit);
+            scalingOption.getExercises().getLast().setWeightUnit(unit);
         }
         return this;
     }
 
     public ScalingOptionBuilder notes(String notes) {
         if (!scalingOption.getExercises().isEmpty()) {
-            scalingOption.getExercises().get(scalingOption.getExercises().size() - 1).setNotes(notes);
+            scalingOption.getExercises().getLast().setNotes(notes);
         }
         return this;
     }

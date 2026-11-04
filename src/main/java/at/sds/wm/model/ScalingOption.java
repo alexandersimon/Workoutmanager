@@ -1,45 +1,41 @@
 package at.sds.wm.model;
 
+import at.sds.wm.model.converter.DurationMillisConverter;
 import at.sds.wm.model.enums.ScalingLevel;
 import jakarta.persistence.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="ScalingOption")
+@Table(name="scaling_option")
 public class ScalingOption {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "scaling_level", nullable = false, length = 30)
     private ScalingLevel level;
 
     @ManyToOne
-    @JoinColumn(name="basedOnId")
+    @JoinColumn(name = "based_on_id")
     private ScalingOption basedOn;
 
-    //@OneToMany
-    /*
-    @OneToMany(
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-    )*/
-    /*
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )*/
-    /*
-    @OneToMany(
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-    )*/
     @OneToMany(
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @JoinColumn(name = "scaling_option_id", nullable = false)
     @OrderColumn(name = "exercise_position")
-    private List<Exercise> exercises;
+    private List<Exercise> exercises = new ArrayList<>();
     private Integer rounds;
+
+    @Convert(converter = DurationMillisConverter.class)
+    @Column(name = "rest_between_rounds_ms")
     private Duration restBetweenRounds;
+
 
     /**
      * Gets the scaling level of this option.
@@ -225,4 +221,5 @@ public class ScalingOption {
 
         return totalReps * Math.max(1, roundsToCount);
     }
+
 }

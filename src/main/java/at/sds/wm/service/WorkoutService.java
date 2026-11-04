@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 public class WorkoutService {
 
-    private static Logger logger = LoggerFactory.getLogger(WorkoutService.class);
+    private final Logger logger = LoggerFactory.getLogger(WorkoutService.class);
 
     private final ExerciseFormatter exerciseFormatter;
     private final WorkoutRepository workoutRepository;
@@ -94,6 +94,7 @@ public class WorkoutService {
                 .mapToInt(scalingOption -> scalingOption.getExercises().size())
                 .sum();
     }
+
     public List<Workout> getAllWorkouts() {
         return workoutRepository.findAll();
     }
@@ -101,13 +102,7 @@ public class WorkoutService {
     @Transactional(readOnly = true)
     public Workout getWorkoutById(Long id) {
         logger.info("getWorkoutById - START WorkoutId = {}", id );
-/*
-        if (workoutRepository.findById(id).isEmpty()) {
-            logger.warn("getWorkoutById - WorkoutId not found = {}", id );
-            throw new WorkoutIdNotFoundException("workout not found" + id);
-        }
-        return workoutRepository.findById(id).get();
-*/
+
         return workoutRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.warn("WorkoutId not found: {}", id);
@@ -117,17 +112,18 @@ public class WorkoutService {
                     );
                 });
     }
-/*
-    public Workout createWorkout (Workout workout) {
-        logger.info("createWorkout - START WorkoutId = {}", workout.getId());
 
-        if (!workoutRepository.findById(workout.getId()).isEmpty()) {
-            logger.warn("createWorkout - WorkoutId already exists = {}", workout.getId() );
-            throw new WorkoutIdDuplicateException("workout already exists " + workout.getId());
-        }
-        return workoutRepository.save(workout);
+    @Transactional(readOnly = true)
+    public String getWorkoutName(Long id) {
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() ->
+                        new WorkoutIdNotFoundException(
+                                "Workout nicht gefunden: " + id
+                        ));
+
+        return workout.getName();
     }
-*/
+
     @Transactional
     public Workout createWorkout(Workout workout) {
         if (workout.getId() == null) {
@@ -200,14 +196,13 @@ public class WorkoutService {
                     ));
         }
 
-        if (supplied.getName() == null
-                || supplied.getName().isBlank()) {
-            throw new IllegalArgumentException("Movement-Name missing");
+        if (supplied.getName() == null || supplied.getName().isBlank()) {
+            throw new IllegalArgumentException("Movement-Name fehlt");
         }
 
         String name = supplied.getName().strip();
 
-        return movementRepository.findByNameIgnoreCase(name)
+        return movementRepository.findByName(name)
                 .orElseGet(() -> {
                     Movement movement = new Movement();
                     movement.setName(name);

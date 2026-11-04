@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface MovementRepository
         extends JpaRepository<Movement, Long> {
 
-    Optional<Movement> findByNameIgnoreCase(String name);
+    Optional<Movement> findByName(String name);
 }

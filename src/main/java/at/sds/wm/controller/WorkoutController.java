@@ -2,11 +2,9 @@ package at.sds.wm.controller;
 
 import at.sds.wm.exceptions.*;
 import at.sds.wm.model.Exercise;
-import at.sds.wm.model.ScalingOption;
 import at.sds.wm.model.Workout;
 
 import at.sds.wm.model.enums.ScalingLevel;
-import at.sds.wm.repository.WorkoutRepository;
 import at.sds.wm.service.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,18 +14,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.logging.Level;
 
 @RestController
 @Tag(name = "Document Workouts-API")
@@ -153,6 +145,11 @@ public class WorkoutController {
         return ResponseEntity.ok(workout);
     }
 
+    @GetMapping("/workouts/{id}/name")
+    public String getWorkoutName(@PathVariable Long id) {
+        return workoutService.getWorkoutName(id);
+    }
+
     @GetMapping("/workouts/{id}/exercises")
     @Operation(summary = "list exercises of a workout", description = "list all exercises of the workout with 'id'")
     @ResponseStatus(HttpStatus.OK)
@@ -161,7 +158,7 @@ public class WorkoutController {
     public ResponseEntity <List<Exercise>> getExercises(@PathVariable String id, @RequestParam(value = "level") String level) {
 
         // check Workout-Id
-        Long idLong;
+        long idLong;
         try {
             idLong = Long.parseLong(id);
         }
@@ -179,7 +176,7 @@ public class WorkoutController {
         }
 
         // get list of excercises
-        List<Exercise> exercises = null;
+        List<Exercise> exercises;
         try{
             exercises = workout.getScalingOption(scalingLevel).getExercises();
         } catch (RuntimeException e) {

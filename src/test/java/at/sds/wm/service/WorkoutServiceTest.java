@@ -39,7 +39,7 @@ public class WorkoutServiceTest {
         Optional<Exercise> exercise = workoutService.findExerciseByMovementName(murph, "Air Squats");
 
         assertTrue(exercise.isPresent());
-        assertEquals(300, exercise.get().getReps().get(0));
+        assertEquals(300, exercise.get().getReps().getFirst());
     }
     @Test
     public void testCountExercises () {
@@ -86,7 +86,7 @@ public class WorkoutServiceTest {
         Optional<String> formatedExercise = workoutService.findAndFormatExercise(test, "Push-ups");
 
         assertTrue(formatedExercise.isPresent());
-        assertEquals(new String("Push-ups - 200 reps"), formatedExercise.get());
+        assertEquals("Push-ups - 200 reps", formatedExercise.get());
     }
 
     @Test

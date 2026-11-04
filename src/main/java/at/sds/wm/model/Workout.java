@@ -1,5 +1,6 @@
 package at.sds.wm.model;
 
+import at.sds.wm.model.converter.DurationMillisConverter;
 import at.sds.wm.model.enums.ScalingLevel;
 import at.sds.wm.model.enums.WorkoutType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,44 +14,48 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 @Entity
-@Table (name="Workout")
+@Table (name="workout")
 @NamedQuery(name="findAllWokouts", query = "select w from Workout w")
 public class Workout {
 
     @Valid
-    @Schema(name = "workout id", required = true)
+    @Schema(name = "workout id", requiredMode = Schema.RequiredMode.REQUIRED)
     @Id
     private Long id;
 
     @NotEmpty(message = "workout name is mandatory but is empty")
     @NotBlank(message = "workout name is mandatory but is blank")
-    @Schema(name = "workout name", required = true)
-    @Column(name="name")
+    @Schema(name = "workout name", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(name = "name", nullable = false, length = 200)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "workout_type", length = 30)
     private WorkoutType type;
+
+    @Column(name = "workout_date")
     private LocalDate date;
+
+    @Column(name = "description", length = 4000)
     private String description;
+
+    @Convert(converter = DurationMillisConverter.class)
+    @Column(name = "timecap_ms")
     private Duration timecap;
 
     @Min(1)
     private int rounds;
+
+    @Convert(converter = DurationMillisConverter.class)
+    @Column(name = "rest_between_rounds_ms")
     private Duration restBetweenRounds;
 
-    //@OneToMany
-    /*
     @OneToMany(
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )*/
-    /*
-    @OneToMany(
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-    )*/
-    @OneToMany(
+            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @JoinColumn(name = "workout_id", nullable = false)
     private List<ScalingOption> scalingOptions;
 
     /**

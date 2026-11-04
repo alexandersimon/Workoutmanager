@@ -1,7 +1,6 @@
 package at.sds.wm.util;
 
 import at.sds.wm.model.Exercise;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;

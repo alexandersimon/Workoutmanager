@@ -1,34 +1,52 @@
 package at.sds.wm.model;
 
+import at.sds.wm.model.converter.DurationMillisConverter;
 import at.sds.wm.model.enums.WeightUnit;
 import jakarta.persistence.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 
 @Entity
-@Table(name="Exercise")
+@Table(name="exercise")
 public class Exercise {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //@ManyToOne
-    /*
-    @ManyToOne(
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-    )
-     */
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "movement_id", nullable = false)
     private Movement movement;
-    private List<Integer> reps;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "exercise_repetition",
+            joinColumns = @JoinColumn(name = "exercise_id")
+    )
+    @OrderColumn(name = "rep_position")
+    @Column(name = "repetitions", nullable = false)
+    private List<Integer> reps = new ArrayList<>();
+
     private Double distance;
+
+    @Convert(converter = DurationMillisConverter.class)
+    @Column(name = "duration_ms")
     private Duration duration;
+
+    @Column(name = "weight_male")
     private Double weightMale;
+
+    @Column(name = "weight_female")
     private Double weightFemale;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "weight_unit", length = 10)
     private WeightUnit weightUnit;
+
+    @Column(name = "notes", length = 2000)
     private String notes;
 
     /**
