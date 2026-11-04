@@ -5,6 +5,7 @@ import at.sds.wm.model.Exercise;
 import at.sds.wm.model.Movement;
 import at.sds.wm.model.ScalingOption;
 import at.sds.wm.model.Workout;
+import at.sds.wm.model.enums.ScalingLevel;
 import at.sds.wm.repository.MovementRepository;
 import at.sds.wm.repository.WorkoutRepository;
 import at.sds.wm.util.ExerciseFormatter;
@@ -13,8 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class WorkoutService {
@@ -141,15 +141,75 @@ public class WorkoutService {
     }
 
     @Transactional
-    public Workout setWorkoutById(Long id, Workout workout) {
-        logger.info("setWorkoutById - START WorkoutId = {}", id );
+    public Workout setWorkoutById(Long id, Workout request) {
+        Workout existing = workoutRepository.findById(id)
+                .orElseThrow(() -> new WorkoutIdNotFoundException(
+                        "Workout nicht gefunden: " + id
+                ));
 
-        if (workoutRepository.findById(id).isEmpty()) {
-            logger.warn("setWorkoutById - WorkoutId not found = {}", id);
-            throw new WorkoutIdNotFoundException("workout to set not found " + id);
+        // Request vor Änderungen auf doppelte Levels prüfen.
+        Set<ScalingLevel> requestedLevels =
+                EnumSet.noneOf(ScalingLevel.class);
+
+        if (request.getScalingOptions() == null) {
+            throw new IllegalArgumentException(
+                    "Scaling Options müssen angegeben werden"
+            );
         }
-        resolveMovements(workout);
-       return workoutRepository.save(workout);
+
+        for (ScalingOption incoming : request.getScalingOptions()) {
+            if (incoming == null || incoming.getLevel() == null) {
+                throw new IllegalArgumentException(
+                        "Scaling Level fehlt"
+                );
+            }
+
+            if (!requestedLevels.add(incoming.getLevel())) {
+                throw new IllegalArgumentException(
+                        "Scaling Level mehrfach angegeben: "
+                                + incoming.getLevel()
+                );
+            }
+
+            if (incoming.getBasedOn() != null) {
+                throw new IllegalArgumentException(
+                        "basedOn wird von diesem Update noch nicht unterstützt"
+                );
+            }
+        }
+
+        existing.setName(request.getName());
+        existing.setType(request.getType());
+        existing.setDate(request.getDate());
+        existing.setDescription(request.getDescription());
+        existing.setTimecap(request.getTimecap());
+        existing.setRounds(request.getRounds());
+        existing.setRestBetweenRounds(request.getRestBetweenRounds());
+
+        for (ScalingOption incoming : request.getScalingOptions()) {
+            ScalingOption target =
+                    existing.getScalingOption(incoming.getLevel());
+
+            if (target == null) {
+                target = new ScalingOption();
+                target.setLevel(incoming.getLevel());
+                existing.addScalingOptions(target);
+            }
+
+            target.setRounds(incoming.getRounds());
+            target.setRestBetweenRounds(
+                    incoming.getRestBetweenRounds()
+            );
+
+            replaceExercises(target, incoming.getExercises());
+        }
+
+        // Vollständiger PUT: nicht mehr enthaltene Levels entfernen.
+        existing.getScalingOptions().removeIf(
+                option -> !requestedLevels.contains(option.getLevel())
+        );
+
+        return existing;
     }
 
     @Transactional
@@ -213,5 +273,43 @@ public class WorkoutService {
                     return movementRepository.saveAndFlush(movement);
                 });
     }
+    private void replaceExercises(
+            ScalingOption target,
+            List<Exercise> incomingExercises
+    ) {
+        target.getExercises().clear();
 
+        if (incomingExercises == null) {
+            return;
+        }
+
+        for (Exercise incoming : incomingExercises) {
+            if (incoming == null) {
+                throw new IllegalArgumentException(
+                        "Exercise darf nicht null sein"
+                );
+            }
+
+            Exercise exercise = new Exercise();
+
+            exercise.setMovement(
+                    resolveMovement(incoming.getMovement())
+            );
+
+            exercise.setReps(
+                    incoming.getReps() == null
+                            ? null
+                            : new ArrayList<>(incoming.getReps())
+            );
+
+            exercise.setDistance(incoming.getDistance());
+            exercise.setDuration(incoming.getDuration());
+            exercise.setWeightMale(incoming.getWeightMale());
+            exercise.setWeightFemale(incoming.getWeightFemale());
+            exercise.setWeightUnit(incoming.getWeightUnit());
+            exercise.setNotes(incoming.getNotes());
+
+            target.addExercise(exercise);
+        }
+    }
 }

@@ -157,7 +157,6 @@ public class WorkoutController {
     @Parameter(name = "level", required = true)
     public ResponseEntity <List<Exercise>> getExercises(@PathVariable String id, @RequestParam(value = "level") String level) {
 
-        // check Workout-Id
         long idLong;
         try {
             idLong = Long.parseLong(id);
@@ -167,7 +166,6 @@ public class WorkoutController {
         }
         Workout workout = workoutService.getWorkoutById(idLong);
 
-        // check ScalingLevel
         ScalingLevel scalingLevel;
         try {
             scalingLevel = ScalingLevel.valueOf(level.toUpperCase());
@@ -175,7 +173,6 @@ public class WorkoutController {
             throw new ScalingLevelNotValidException("ScalingLevel invalid " + level);
         }
 
-        // get list of excercises
         List<Exercise> exercises;
         try{
             exercises = workout.getScalingOption(scalingLevel).getExercises();
